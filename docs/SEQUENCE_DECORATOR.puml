@@ -1,0 +1,27 @@
+@startuml
+title Decorator Pattern: Frame Processing Sequence
+
+participant "Player" as Player
+participant "WatermarkDecorator" as WD
+participant "SubtitleDecorator" as SD
+participant "BaseMediaSource" as MS
+participant "Renderer" as Renderer
+
+loop for each frame
+    Player -> WD: getNextFrame()
+    activate WD
+    WD -> SD: getNextFrame()
+    activate SD
+    SD -> MS: getNextFrame()
+    activate MS
+    MS --> SD: rawFrame
+    deactivate MS
+    SD -> SD: applySubtitles(rawFrame)
+    SD --> WD: subtitledFrame
+    deactivate SD
+    WD -> WD: applyWatermark(subtitledFrame)
+    WD --> Player: finalFrame
+    deactivate WD
+    Player -> Renderer: render(finalFrame)
+end
+@enduml
