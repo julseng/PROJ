@@ -1,0 +1,42 @@
+@startuml
+actor "PlayDemo" as Demo
+
+participant "player: MediaPlayer" as Player
+participant "decoratedMedia: SubtitleDecorator" as SubtitleDecorator
+participant "watermarkedMedia: WatermarkDecorator" as WatermarkDecorator
+participant "media: LocalFileSource" as Media
+participant "implementation: SoftwareImplementation" as Renderer
+
+Demo -> Player: render(decoratedMedia)
+activate Player
+
+Player -> Renderer: render(decoratedMedia)
+activate Renderer
+
+Renderer -> SubtitleDecorator: play()
+activate SubtitleDecorator
+
+SubtitleDecorator -> WatermarkDecorator: play()
+activate WatermarkDecorator
+
+WatermarkDecorator -> Media: play()
+activate Media
+Media --> WatermarkDecorator: mediaData
+deactivate Media
+
+WatermarkDecorator -> WatermarkDecorator: addWatermark()
+WatermarkDecorator --> SubtitleDecorator: watermarkedMediaData
+deactivate WatermarkDecorator
+
+SubtitleDecorator -> SubtitleDecorator: addSubtitles()
+SubtitleDecorator --> Renderer: finalMediaData
+deactivate SubtitleDecorator
+
+Renderer -> Renderer: renderFrame(finalMediaData)
+Renderer --> Player
+deactivate Renderer
+
+Player --> Demo
+deactivate Player
+
+@enduml
